@@ -1,0 +1,32 @@
+// Copy this file to config.h and adjust for your build.
+// config.h is git-ignored (it has no secrets, just your hardware choices).
+
+#pragma once
+
+// ---- TB6612 motor driver ----
+// Left motor
+#define PWMA 5
+#define AIN1 7
+#define AIN2 8
+// Right motor
+#define PWMB 6
+#define BIN1 9
+#define BIN2 10
+// Driver enable
+#define STBY_PIN 4
+
+// ---- HC-SR04 ultrasonic ----
+#define TRIG_PIN 11
+#define ECHO_PIN 12
+
+// ---- Battery voltage (via divider to A0) ----
+#define BATT_PIN A0
+// Calibrate: measure real battery voltage with a multimeter, read the
+// reported batt_v, set DIVIDER_RATIO = real / reported * current value.
+#define DIVIDER_RATIO 2.0
+
+// ---- Safety limits (firmware-enforced, the AI cannot override) ----
+#define MAX_SPEED_PCT 70     // fastest any command may request
+#define MAX_MOVE_MS 5000     // longest single move
+#define WATCHDOG_MS 800      // stop if Pi is silent this long (no active move)
+#define STOP_DIST_CM 20      // hard stop driving forward inside this distance

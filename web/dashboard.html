@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>lil-tanker dashboard</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #14100c; color: #f2e9e0;
+         max-width: 560px; margin: 0 auto; padding: 1rem; }
+  h1 { color: #ff6600; }
+  .card { background: #1e1813; border: 1px solid #3a2f26; border-radius: 10px;
+          padding: 1rem; margin-bottom: 1rem; }
+  .stat { font-size: 1.4rem; font-family: monospace; }
+  .pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;
+         max-width: 300px; margin: 0 auto; }
+  .pad button { padding: 1rem; font-size: 1.2rem; background: #ff6600; color: #fff;
+                border: none; border-radius: 8px; cursor: pointer; }
+  .pad button.stop { background: #a33; grid-column: span 3; }
+  #log { font-family: monospace; font-size: 0.85rem; max-height: 200px;
+         overflow-y: auto; white-space: pre-wrap; }
+  .muted { color: #a89c90; }
+</style>
+</head>
+<body>
+  <h1>lil-tanker</h1>
+  <div class="card">
+    <div>Status: <span id="conn" class="stat">…</span></div>
+    <div>Obstacle: <span id="dist" class="stat">…</span> cm</div>
+    <div>Battery: <span id="batt" class="stat">…</span> V</div>
+  </div>
+  <div class="card">
+    <div class="pad">
+      <span></span><button data-dir="forward">▲</button><span></span>
+      <button data-dir="left">◀</button><button data-dir="back">▼</button><button data-dir="right">▶</button>
+      <button class="stop" id="stop">STOP</button>
+    </div>
+    <p class="muted">Tap to nudge. Manual control and the AI share the same safety limits.</p>
+  </div>
+  <div class="card">
+    <h3>Said</h3>
+    <div id="log" class="muted">…</div>
+  </div>
+<script>
+  async function api(path, body) {
+    const r = await fetch(path, body ? {method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(body)} : {});
+    return r.json();
+  }
+  document.querySelectorAll(".pad button[data-dir]").forEach(b =>
+    b.addEventListener("click", () => api("/api/drive", {dir: b.dataset.dir, ms: 600, speed: 40})));
+  document.getElementById("stop").addEventListener("click", () => api("/api/stop", {}));
+  async function tick() {
+    try {
+      const s = await api("/api/status");
+      document.getElementById("conn").textContent = s.connected ? "online" : "OFFLINE";
+      document.getElementById("dist").textContent = s.dist_cm ?? "—";
+      document.getElementById("batt").textContent = s.batt_v ?? "—";
+      document.getElementById("log").textContent = (s.said || []).join("\n") || "…";
+    } catch (e) { document.getElementById("conn").textContent = "no brain"; }
+  }
+  setInterval(tick, 1000); tick();
+</script>
+</body>
+</html>

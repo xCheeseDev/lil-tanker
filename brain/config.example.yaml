@@ -1,0 +1,27 @@
+# Copy to config.yaml and edit. The brain creates it for you on first run.
+
+ai:
+  # Presets: point base_url at whichever you use.
+  #   Ollama (local):    http://localhost:11434/v1   (or http://<pc-ip>:11434/v1 from the Pi)
+  #   LM Studio (local): http://localhost:1234/v1
+  #   OpenAI:            https://api.openai.com/v1
+  provider: "ollama"
+  base_url: "http://localhost:11434/v1"
+  api_key: "not-needed"   # set a real key for OpenAI / other cloud providers
+  model: "qwen2.5:7b"     # use a model with tool/function calling support
+
+robot:
+  serial_port: "/dev/ttyACM0"  # Uno usually shows up as ttyACM0; check `ls /dev/ttyACM*`
+  baud: 115200
+
+# Human units -> firmware milliseconds. Calibrate: time how long your bot
+# takes to drive 1 meter and to spin 90 degrees, then set these.
+calibration:
+  ms_per_meter: 2000
+  ms_per_90deg: 900
+
+safety:
+  max_speed_pct: 60   # brain-side cap (firmware has its own, lower wins)
+
+web:
+  port: 8080
